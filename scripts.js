@@ -7,20 +7,63 @@ async function handleFormSubmit(event) {
     const message = document.getElementById('message').value;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameRegex = /^[a-zA-Z\s'-]+$/;
+
+    const minMessageLength = 10;
+    const maxMessageLength = 500;
    
     if (!name || !email || !message) {
-        alert('Please fill in all fields.');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: 'Please fill in all fields.',
+        });
+        return;
+    }
+
+    if (!nameRegex.test(name)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Name',
+            text: 'Please enter a valid name. Only letters, spaces, hyphens, and apostrophes are allowed.',
+        });
         return;
     }
 
     if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Email',
+            text: 'Please enter a valid email address.',
+        });
+        return;
+    }
+
+    if (message.trim().length < minMessageLength) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Message Too Short',
+            text: `Please provide a message with at least ${minMessageLength} characters.`,
+        });
+        return;
+    }
+
+    if (message.trim().length > maxMessageLength) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Message Too Long',
+            text: `Your message cannot exceed ${maxMessageLength} characters.`,
+        });
         return;
     }
     
     const accessKey = 'YOUR_ACCESS_KEY_HERE';
     if (!accessKey || accessKey === 'YOUR_ACCESS_KEY_HERE') {
-        alert('Access key is missing or incorrect. Please provide a valid Web3Forms access key.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Access Key Missing',
+            text: 'Access key is missing or incorrect. Please provide a valid Web3Forms access key.',
+        });
         return;
     }
 
@@ -43,16 +86,28 @@ async function handleFormSubmit(event) {
 
       
         if (response.ok) {
-            alert('Your message has been sent successfully!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Message Sent',
+                text: 'Your message has been sent successfully!',
+            });
             document.querySelector('.contact-form').reset();
         } else {
             const errorMessage = await response.json();
             console.error('Error from Web3Forms:', errorMessage);
-            alert('There was an issue sending your message. Please try again later.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: 'There was an issue sending your message. Please try again later.',
+            });
         }
     } catch (error) {
         console.error('Network error:', error);
-        alert('An error occurred. Please check your internet connection and try again.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred. Please check your connection and try again.',
+        });
     } finally {
       
         document.getElementById('loading').style.display = 'none';
